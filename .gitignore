@@ -17,3 +17,5 @@ yarn-error.log
 .composer
 _ide_helper*
 /docker/dbdata
+psysh_history
+.rnd
