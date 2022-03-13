@@ -14,7 +14,9 @@ class ParseFileJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected Collection $collection;
-    protected ?int $recordCount;
+    /**
+     * @var mixed
+     */
 
     /**
      * Create a new job instance.
@@ -24,7 +26,6 @@ class ParseFileJob implements ShouldQueue
     public function __construct(Collection $collection)
     {
         $this->collection = $collection;
-        $this->recordCount = Cache::get(Model::IMPORT_COUNT_CACHE_KEY);
     }
 
     /**
@@ -38,8 +39,6 @@ class ParseFileJob implements ShouldQueue
         DB::beginTransaction();
         try {
             DB::table('rows')->insert($importData);
-            $this->recordCount += count($importData);
-            Cache::put(Model::IMPORT_COUNT_CACHE_KEY, $this->recordCount);
 
             DB::commit();
         } catch (\Exception $e) {
