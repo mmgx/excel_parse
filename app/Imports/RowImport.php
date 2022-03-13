@@ -3,13 +3,14 @@
 namespace App\Imports;
 
 use App\Jobs\ParseFileJob;
-use Illuminate\Support\{Arr, Collection};
+use Illuminate\Support\{Arr, Collection, Facades\Cache};
 use Maatwebsite\Excel\Validators\Failure;
 use Maatwebsite\Excel\Concerns\{SkipsOnFailure,
     ToCollection,
     WithChunkReading,
     WithHeadingRow,
     WithValidation};
+use App\Models\Row as Model;
 
 class RowImport implements ToCollection, WithHeadingRow,WithValidation, SkipsOnFailure, WithChunkReading
 {
@@ -24,6 +25,7 @@ class RowImport implements ToCollection, WithHeadingRow,WithValidation, SkipsOnF
         });
 
         ParseFileJob::dispatch($rows);
+        Cache::put(Model::IMPORT_COUNT_CACHE_KEY, Cache::get(Model::IMPORT_COUNT_CACHE_KEY) + $rows->count());
     }
 
     public function transformDate($value, $format = 'd.m.Y')
